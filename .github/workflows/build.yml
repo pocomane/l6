@@ -1,0 +1,17 @@
+
+name: build
+run-name: ${{ github.actor }} is building the project
+#on: [push]
+on: [workflow_dispatch]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: chmod ugo+x ./build.sh
+      - run: ./build.sh
+      - uses: softprops/action-gh-release@v1
+        with:
+          tag_name: l6-0.0.1
+          files: build/release/*
+
