@@ -148,20 +148,13 @@ The intersection is instead done with the maximum:
 local inter_sphere = sym('max', sphere, sphere2)
 ```
 
-Since these are very common operations, `l6` offers a shortcut:
-
-```
-local two_spheres = sphere << sphere2
-local inter_sphere = sphere >> sphere2
-```
-
 Since all the object are "First class" in `l6`, i.e. you can put it in
 variables or pass to functions, etc, you could also define more readable names
 for such operations:
 
 ```
-local function union(a, b) return a << b end
-local function inter(a, b) return a >> b end
+local function union(a, b) return sym('min', a, b) end
+local function inter(a, b) return sym('max', a, b) end
 ```
 
 `function` is the `lua` keyword that let's you to define new function. In this
@@ -178,7 +171,7 @@ What about the substraction? It is just an union with one of the two expression
 negated:
 
 ```
-local function diff(a, b) return a << -b end
+local function diff(a, b) return sym('min', a, -b) end
 local cut_sphere = diff(sphere, sphere2)
 ```
 
@@ -205,6 +198,39 @@ Automatically it will be recalled:
 
 # Describe complex models in multiple files
 
-... to be continued ...
+When the project grows, it became useful to divide the code among multiple files.
+In `lua` you can execute external files using the `require` function. So, for
+example we can place in a `boolean_operation.lua` file the following code:
 
+```
+local function union(a, b) return sym('min', a, b) end
+local function inter(a, b) return sym('max', a, b) end
+local function diff(a, b) return sym('min', a, -b) end
+return {
+  intersection = inter,
+  union = union,
+  difference = differ,
+}
+```
 
+and recall it from `example.lua` with
+
+```
+local bo = require 'boolean_operation'
+local two_spheres = bo.union(sphere, sphere2)
+local inter_sphere = bo.intersection(sphere, sphere2)
+local cut_sphere = bo.difference(sphere, sphere2)
+```
+
+Since the variables defined with `local` are visible only in declaring scope,
+i.e.  the whole `boolean_operation.lua` file for `intersection`, `union`, etc,
+we need to use the `return` keyword, as the file was a `function` (it actually
+is), to expose the function in the rquiring file. The `{}` constructor
+geneare a `lua` table containing a reference to `inter` into the
+`intersection` field, a reference to `union` into the `union` field, and so
+on. Table field can be access with the `.` operator.
+
+The first time `require` is called with a specific argument, its result is
+cached; when called again with the same argument the file is not
+actually executed again. So you can call `require` without worring too much
+about performance, dependency graph or wierd side effects.
