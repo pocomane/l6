@@ -57,7 +57,7 @@ cd "$BUILDDIR"
 MODULE="zlib"
 echo "building $MODULE"
 if [ -z "$(ls "$BUILDDIR/$MODULE.download.done" 2> /dev/null)" ]; then
-  curl -sL http://zlib.net/zlib-1.2.12.tar.gz --output zlib.tar.gz ||die "can not download $MODULE"
+  curl -sL http://zlib.net/zlib-1.2.13.tar.gz --output zlib.tar.gz ||die "can not download $MODULE"
   tar -xzf zlib.tar.gz ||die "can not download $MODULE"
   mv zlib-1* "$MODULE"/ ||die "can not download $MODULE"
   touch "$BUILDDIR/$MODULE.download.done" ||die "can not download $MODULE"

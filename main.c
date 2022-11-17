@@ -28,6 +28,9 @@ static int msghandler (lua_State *L) {
   return 1;  /* return the traceback */
 }
 
+static char* input_file_name = "init.lua";
+static char* output_file_name = "init.stl";
+
 static int l_main (lua_State *L) {
 
   luaL_openlibs(L);
@@ -49,15 +52,15 @@ static int l_main (lua_State *L) {
   lua_pop(L, 1);
 
   lua_gc(L, LUA_GCGEN, 0, 0);  /* GC in generational mode */
- 
-  if (set_default_name("init.stl")){
+
+  if (set_default_name(output_file_name)){
     lua_writestringerror("can not set default name '%s' - unrecoverable memory allocation error\n", "init.stl");
     lua_pushboolean(L, 0);  /* signal errors */
     return 1;
   }
 
   lua_pushcfunction(L, &msghandler);  /* handler for error print */
-  luaL_loadfile(L, "init.lua");
+  luaL_loadfile(L, input_file_name);
   if (LUA_TFUNCTION != lua_type(L, -1)) {
     lua_writestringerror("%s\n", lua_tostring(L, -1));
     lua_pushboolean(L, 0);  /* signal errors */
@@ -72,12 +75,30 @@ static int l_main (lua_State *L) {
   return 1;
 }
 
+#include <malloc.h>
+#include <string.h>
+
 int main (int argc, char **argv) {
   int status, result;
   lua_State *L = luaL_newstate();
   if (L == NULL) {
     lua_writestringerror("%s", "cannot create state: not enough memory\n");
     return 13;
+  }
+  if (argc > 1) {
+    input_file_name = argv[1];
+    size_t inlen = strlen(input_file_name);
+    output_file_name = (char*) malloc(inlen+5);
+    size_t last_dot = inlen;
+    for (size_t k = 0; k < inlen; k += 1){
+      output_file_name[k] = input_file_name[k];
+      if (input_file_name[k] == '.') last_dot = k;
+    }
+    output_file_name[last_dot+0] = '.';
+    output_file_name[last_dot+1] = 's';
+    output_file_name[last_dot+2] = 't';
+    output_file_name[last_dot+3] = 'l';
+    output_file_name[last_dot+4] = '\0';
   }
   lua_pushcfunction(L, &msghandler);  /* handler for error print */
   lua_pushcfunction(L, &l_main);  /* to call 'l_main' in protected mode */
