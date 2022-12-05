@@ -44,7 +44,7 @@ static int l_main (lua_State *L) {
       lua_pop(L, 1); // removes the value; keeps the key for next iteration
     } else {
       const char* key = lua_tostring(L, -2);
-      const char* valtyp = lua_typename(L, lua_type(L, -1));
+      //const char* valtyp = lua_typename(L, lua_type(L, -1));
       lua_setglobal(L, key); // this pops also an iteme from the stack
     }
   }

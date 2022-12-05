@@ -10,8 +10,8 @@ cd "$PRJDIR" ||die
 
 BUILDDIR="$PRJDIR/build"
 CMAKEOPT=" -D CMAKE_SYSTEM_PREFIX_PATH='$BUILDDIR' -D CMAKE_PREFIX_PATH='$BUILDDIR' -D BOOST_ROOT:PATHNAME='$BUILDDIR' -D CMAKE_INSTALL_PREFIX='$BUILDDIR' "
-export CFLAGS=" -isystem $BUILDDIR/include "
-export CPPFLAGS=" -isystem $BUILDDIR/include "
+export CFLAGS=" -isystem $BUILDDIR/include -O2 -Wall "
+export CPPFLAGS=" -isystem $BUILDDIR/include -O2 -Wall "
 export LDFLAGS=" -L$BUILDDIR/lib "
 
 mkdir -p "$BUILDDIR"

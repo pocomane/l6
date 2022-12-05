@@ -14,7 +14,7 @@ static void print_lua_stack(lua_State *L){
   printf("lua stack base -> ");
   for(int i = 1; i <= lua_gettop(L); i += 1) {
       lua_pushvalue(L, i);
-      const char *str = lua_tostring(L, -1);
+      // const char *str = lua_tostring(L, -1);
       printf("%c", *luaL_typename(L, i));
       lua_pop(L, 1);
   }
