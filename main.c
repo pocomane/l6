@@ -3,7 +3,6 @@
 #include "lualib.h"
 
 int luaopen_libfive(lua_State *L);
-int set_default_name(const char* name);
 
 static int l_report (lua_State *L, int status) {
   if (status != LUA_OK) {
@@ -52,12 +51,6 @@ static int l_main (lua_State *L) {
   lua_pop(L, 1);
 
   lua_gc(L, LUA_GCGEN, 0, 0);  /* GC in generational mode */
-
-  if (set_default_name(output_file_name)){
-    lua_writestringerror("can not set default name '%s' - unrecoverable memory allocation error\n", "init.stl");
-    lua_pushboolean(L, 0);  /* signal errors */
-    return 1;
-  }
 
   lua_pushcfunction(L, &msghandler);  /* handler for error print */
   luaL_loadfile(L, input_file_name);

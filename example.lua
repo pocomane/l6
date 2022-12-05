@@ -209,5 +209,5 @@ print(save_stl(revolve(translate(xxx, -1,0,0)), 5, 20))
 
 -- better fstl integration: do not update 
 -- until the rendering end
-os.execute("mv init.stl example_view.stl")
+os.execute("mv example.stl example_view.stl")
 

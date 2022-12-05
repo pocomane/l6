@@ -31,8 +31,6 @@ static int finalize_tree(lua_State *L){
 #define LUA_ERR LUA_RES(2)
 #define LUA_PUSHERR(L, S) (lua_pushnil(L), lua_pushstring(L,S), 1)
 
-static char* default_name = 0;
-
 static libfive_tree * new_uvtree_or_die(lua_State *L, size_t naux){
   libfive_tree * result = lua_newuserdatauv(L, sizeof(libfive_tree), naux);
   if(NULL == result){
@@ -188,6 +186,7 @@ static int sym(lua_State *L){
 }
 
 static int save_stl(lua_State *L){
+  lua_Debug ar;
   if(!is_uvtree(L, 1) && LUA_PUSHERR(L, "first argument must be symbolic expression"))
     return LUA_ERR;
   if(LUA_TNUMBER != lua_type(L, 2) && LUA_PUSHERR(L, "second argument must be a number"))
@@ -196,7 +195,17 @@ static int save_stl(lua_State *L){
     return LUA_ERR;
   char* path;
   if(lua_gettop(L) < 4 || LUA_TNIL == lua_type(L, 4)){
-    path = default_name;
+    lua_getstack(L, 1, &ar);
+    lua_getinfo(L, "S", &ar);
+    size_t len = strlen(ar.short_src);
+    if (len > 4) {
+      ar.short_src[len-3] = 's';
+      ar.short_src[len-2] = 't';
+      ar.short_src[len-1] = 'l';
+      path = ar.short_src;
+    } else {
+      path = "out.stl";
+    }
   } else {
     if(LUA_TSTRING != lua_type(L, 4) && LUA_PUSHERR(L, "forth argument must be a string"))
       return LUA_ERR;
@@ -279,12 +288,5 @@ int luaopen_libfive(lua_State *L){
   put_cfunc_in_table(L, "save_stl", save_stl);
 
   return 1; // return the resul ttable
-}
-
-int set_default_name(const char* name){
-  if (0!= default_name) free(default_name);
-  default_name = strdup(name);
-  if (0 == default_name) return -1;
-  return 0;
 }
 
