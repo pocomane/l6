@@ -140,6 +140,9 @@ MODULE="libfive"
 echo "building $MODULE"
 if [ -z "$(ls "$BUILDDIR/$MODULE.download.done" 2> /dev/null)" ]; then
   git clone https://github.com/libfive/libfive ||die "can not download $MODULE"
+  cd libfive
+  git checkout 6f844b12188b607d1364eb7742d905d303a5ebed ||die "can not download $MODULE"
+  cd ..
   set -e
   sed -i '/march=native/d' libfive/CMakeLists.txt
   echo '' >>  libfive/libfive/src/CMakeLists.txt
